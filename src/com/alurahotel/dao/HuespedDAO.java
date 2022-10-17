@@ -8,9 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.alurahotel.modelo.Huesped;
-import com.alurahotel.modelo.Reserva;
+
 
 
 public class HuespedDAO {
@@ -103,7 +102,7 @@ public class HuespedDAO {
 		
 		try {
 			PreparedStatement statement = con.prepareStatement(" select * from huespedes where "
-					+ "apellido like '%"+nombre+"%' or id_reserva like '%"+nombre+"%'");
+					+ "apellido like '%"+nombre+"%'");
 			
 			try(statement){
 				statement.execute();
@@ -126,20 +125,25 @@ public class HuespedDAO {
 		}
 	}
 	
-	public int modificar(String nombre, String apellido, Date fechaNacimiento, String nacionalidad, String telefono) {
+	public int modificar(String nombre, String apellido, Date fechaNacimiento, String nacionalidad, String telefono, 
+			Integer idReserva, Integer id) {
 		try {
 			PreparedStatement statement = con.prepareStatement("UPDATE huespedes SET "
-					+ "nombre = ?, "
-					+ "apellido = ?, "
-					+ "fecha_nacimiento = ?, "
-					+ "nacionalidad = ?, "
-					+ "telefono = ? ");
+					+ " nombre = ?, "
+					+ " apellido = ?, "
+					+ " fecha_nacimiento = ?, "
+					+ " nacionalidad = ?, "
+					+ " telefono = ?, "
+					+ " id_reserva = ? "
+					+ " where id = ? ");
 			try(statement){
 				statement.setString(1, nombre);
 				statement.setString(2, apellido);
 				statement.setDate(3, fechaNacimiento);
 				statement.setString(4, nacionalidad);
 				statement.setString(5, telefono);
+				statement.setInt(6, idReserva);
+				statement.setInt(7, id);
 				
 				statement.execute();
 				

@@ -5,27 +5,19 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
 import com.alurahotel.controller.HuespedController;
 import com.alurahotel.controller.ReservaController;
 import com.alurahotel.modelo.Huesped;
 import com.alurahotel.modelo.Reserva;
-
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Color;
-import java.awt.SystemColor;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.util.IllegalFormatPrecisionException;
 import java.util.List;
 import java.util.Optional;
-import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -265,11 +257,10 @@ public class Busqueda extends JFrame {
 		btnEditar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(!tieneFilaElegidaReservas()) {
-					modificarReserva();
-				}else if(!tieneFilaElegidaHuesped()) {
-					modificarHuesped();
-				}
+				modificar();
+				LimpiarTablas();
+				CargarTablaHuesped();
+				CargarTablaReservas();
 			}
 		});
 		
@@ -290,6 +281,9 @@ public class Busqueda extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				eliminar();
+				LimpiarTablas();
+				CargarTablaHuesped();
+				CargarTablaReservas();
 			}});
 		
 		
@@ -306,12 +300,12 @@ public class Busqueda extends JFrame {
 		
 	}
 	public boolean tieneFilaElegidaReservas() {
-		return tbReservas.getSelectedRow() == 0 || tbReservas.getSelectedColumn() == 0;
+		return tbReservas.getSelectedRow() >=0 || tbReservas.getSelectedColumn() >= 0;
 	}
 	
 	
 	private boolean tieneFilaElegidaHuesped() {
-		return tbHuespedes.getSelectedRow() == 0 || tbHuespedes.getSelectedColumn() == 0;
+		return tbHuespedes.getSelectedRow() >= 0 || tbHuespedes.getSelectedColumn() >= 0;
 	}
 	
 	private void LimpiarTablas() {
@@ -397,34 +391,41 @@ public class Busqueda extends JFrame {
 		
 	}
 	
-	public void modificarReserva() {
-		Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn()))
-				.ifPresentOrElse( fila -> {
-					Integer id = Integer.valueOf(modeloH.getValueAt(tbHuespedes.getSelectedRow(),0 ).toString());
-					Date fechaEntrada =  Date.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString());
-					Date fechaSalida =  Date.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString());
-					String valor = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 3);
-					String FormaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
-					
-					reservaController.modificar(fechaEntrada, fechaSalida, valor, FormaPago, id);
-					
-					JOptionPane.showMessageDialog(this, "Reserva modificada con exito!");
-				}, () -> JOptionPane.showMessageDialog(this, "Por favor, elije un item")) ;
-	}
-	
-	public void modificarHuesped() {
-		Optional.ofNullable(modelo.getValueAt(tbHuespedes.getSelectedRow(), tbReservas.getSelectedColumn()))
-		.ifPresentOrElse(fila -> {
-			String nombre = modelo.getValueAt(tbHuespedes.getSelectedRow(), 1).toString();
-			String apellido = modelo.getValueAt(tbHuespedes.getSelectedRow(), 2).toString();
-			Date fechaNacimeinto = Date.valueOf(modelo.getValueAt(tbHuespedes.getSelectedRow(), 3).toString());
-			String nacionalidad = modelo.getValueAt(tbHuespedes.getSelectedRow(), 4).toString();
-			String telefono = modelo.getValueAt(tbHuespedes.getSelectedRow(), 5).toString();
-			
-			huespedController.modificar(nombre, apellido, fechaNacimeinto, nacionalidad, telefono);
-			JOptionPane.showMessageDialog(this, "Huesped modificado con exito!");
-			
-		},() -> JOptionPane.showMessageDialog(this, "Por favor, elije un item"));
+	public void modificar() {
+		if(!tieneFilaElegidaHuesped() && !tieneFilaElegidaReservas()) {
+			JOptionPane.showMessageDialog(this, "Por favor, elije un item");
+            return;
+		}
+		if(tieneFilaElegidaReservas()) {
+			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn()))
+			.ifPresentOrElse( fila -> {
+				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(),0 ).toString());
+				Date fechaEntrada =  Date.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString());
+				Date fechaSalida =  Date.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString());
+				String valor = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 3);
+				String formaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
+				System.out.println(fechaEntrada + " " + fechaSalida + " " + valor + " " + formaPago + " " + id);
+				reservaController.modificar(fechaEntrada, fechaSalida, valor, formaPago, id);
+				
+				JOptionPane.showMessageDialog(this, "Reserva modificada con exito!");
+			}, () -> JOptionPane.showMessageDialog(this, "Por favor, elije un item")) ;
+		}
+		if(tieneFilaElegidaHuesped()) {
+			Optional.ofNullable(modeloH.getValueAt(tbHuespedes.getSelectedRow(), tbHuespedes.getSelectedColumn()))
+			.ifPresentOrElse(fila -> {
+				Integer id = Integer.valueOf(modeloH.getValueAt(tbHuespedes.getSelectedRow(), 0).toString());
+				String nombre = modeloH.getValueAt(tbHuespedes.getSelectedRow(), 1).toString();
+				String apellido = modeloH.getValueAt(tbHuespedes.getSelectedRow(), 2).toString();
+				Date fechaNacimeinto = Date.valueOf(modeloH.getValueAt(tbHuespedes.getSelectedRow(), 3).toString());
+				String nacionalidad = modeloH.getValueAt(tbHuespedes.getSelectedRow(), 4).toString();
+				String telefono = modeloH.getValueAt(tbHuespedes.getSelectedRow(), 5).toString();
+				Integer idReserva = Integer.valueOf(modeloH.getValueAt(tbHuespedes.getSelectedRow(), 6).toString());
+				
+				huespedController.modificar(nombre, apellido, fechaNacimeinto, nacionalidad, telefono, idReserva, id);
+				JOptionPane.showMessageDialog(this, "Huesped modificado con exito!");
+				
+			},() -> JOptionPane.showMessageDialog(this, "Por favor, elije un item"));
+		}
 	}
 
 

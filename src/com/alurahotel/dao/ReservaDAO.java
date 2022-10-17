@@ -8,11 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import com.alurahotel.modelo.Reserva;
-import com.alurahotel.view.ReservasView;
+
 
 public class ReservaDAO {
 	final private Connection con;
@@ -93,18 +90,19 @@ public class ReservaDAO {
 	public int modificar(Date fechaEntrada, Date fechaSalida, String valor, String formaPago, Integer id) {
 		try {
 			final PreparedStatement statement = con.prepareStatement("UPDATE reservas set "
-					+ "fecha_entrada = ?, "
-					+ "fecha_salida = ?, "
-					+ "valor = ?, "
-					+ "forma_Pago = ?, "
-					+ "where id = ?");
+					+ " fecha_entrada = ?, "
+					+ " fecha_salida = ?, "
+					+ " valor = ?, "
+					+ " forma_pago = ? "
+					+ " where id = ?");
 			try(statement){
+				
 				statement.setDate(1, fechaEntrada);
 				statement.setDate(2, fechaSalida);
 				statement.setString(3, valor);
 				statement.setString(4, formaPago);
 				statement.setInt(5, id);
-			
+				System.out.println(fechaEntrada + " " + fechaSalida + " " + valor + " " + formaPago + " " + id);
 				statement.execute();
 				
 				int updateCount = statement.getUpdateCount();
